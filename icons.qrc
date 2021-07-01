@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/menu">
+        <file>table-row-delete-icon.png</file>
+        <file>file.png</file>
+        <file>forbidden.png</file>
+        <file>upload.png</file>
+    </qresource>
+</RCC>
