@@ -14,9 +14,10 @@ public:
     QByteArray readBytes(int blockSize);
     qint64 fileSize();
     QString fileName(QString filePath);
-    bool openFile(QString fileName);
+    bool openFile(QString fileName, QIODevice::OpenModeFlag openMode);
     void closeFile();
 
+    void appendBytes(const QByteArray &bytes);
 private:
     QFile file;
 

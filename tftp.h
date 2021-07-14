@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QString>
 #include "fileobj.h"
-#include "notify.h"
 #include <QFileInfo>
 #include <QTimer>
 #include <QHostInfo>
@@ -38,6 +37,9 @@ public:
     float getSizeOfData() const;
     void setSizeOfData(qint32 value);
 
+    int getTSize() const;
+    void setTSize(int newTSize);
+
 private:
     enum    OpCode{
         RRQ = 1,
@@ -54,6 +56,7 @@ private:
     QString fileToSend;
     QString filePath;
     int blockSize;
+    int tSize;
 
     unsigned short blockNumber;
     unsigned short pktBlockNumber;
@@ -77,6 +80,7 @@ private:
     void pktReadError(QByteArray *pkt);
 
 
+    QByteArray pktACK(ushort blockNumber);
 signals:
     void cancel();
     void quit();
@@ -91,9 +95,13 @@ public slots:
     void timeExpired();
     void start();
     void stop();
-    void readyRead();
+
     void progressBarUpdate();
-    void errorPacket(QString errorMessage);
+    QByteArray errorPacket(QString errorMessage);
+
+private slots:
+    void readyRead();
+    void readyReadReceive();
 };
 
 #endif // TFTP_H

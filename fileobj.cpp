@@ -1,5 +1,4 @@
 #include "fileobj.h"
-#include "notify.h"
 #include <QFileInfo>
 
 fileObj::fileObj(QObject *parent) : QObject(parent)
@@ -7,20 +6,17 @@ fileObj::fileObj(QObject *parent) : QObject(parent)
 
 }
 
-// Set the filename to open
-
-
 fileObj::~fileObj()
 {
     file.close();
 }
 
 // Open the file and return success or failure
-bool fileObj::openFile(QString fileName)
+bool fileObj::openFile(QString fileName, QIODevice::OpenModeFlag openMode)
 {
     file.setFileName(fileName);
 
-    if(file.open(QIODevice::ReadOnly))
+    if(file.open(openMode))
     {
         return true;
     }
@@ -32,7 +28,6 @@ bool fileObj::openFile(QString fileName)
 
 void fileObj::closeFile()
 {
-
     file.close();
 }
 
@@ -41,6 +36,11 @@ QByteArray fileObj::readBytes(int blockSize)
 {
     QByteArray readTheBytes = file.read(blockSize);
     return readTheBytes;
+}
+
+void fileObj::appendBytes(const QByteArray &bytes)
+{
+   file.write(bytes);
 }
 
 

@@ -11,11 +11,11 @@
 
 #include "tftp.h"
 #include "tftpmanager.h"
+#include "config.h"
 
 #include <QThread>
 #include <QQueue>
 #include <QFileInfo>
-
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -140,6 +140,34 @@ void MainWindow::startProcess()
     transferInProgress = true;
 }
 
+void MainWindow::save()
+{
+    QFile file("something.txt");
+    file.open(QIODevice::WriteOnly);
+    QDataStream ds(&file);
+    ds << ui->leHost->text();
+    ds << ui->lePort->text();
+    ds << ui->cmbBlockSize->currentData();
+
+
+}
+
+void MainWindow::load()
+{
+    QFile file("something.txt");
+    file.open(QIODevice::ReadOnly);
+    QDataStream ds(&file);
+    QString host;
+    QString port;
+
+
+
+    ds >> host >> port;
+    ui->leHost->setText(host);
+    ui->lePort->setText(port);
+    qDebug() << "HOst " << host;
+}
+
 void MainWindow::completed()
 {
     if(!transferInProgress)
@@ -173,3 +201,28 @@ void MainWindow::on_btnDeleteRow_clicked()
 {
     ui->tblFiles->removeRow(ui->tblFiles->currentRow());
 }
+
+void MainWindow::on_btnCredits_clicked()
+{
+    credits *c = new credits(0);
+    c->exec();
+}
+
+
+void MainWindow::on_actionExit_triggered()
+{
+    QCoreApplication::quit();
+}
+
+
+void MainWindow::on_actionSave_Config_triggered()
+{
+    save();
+}
+
+
+void MainWindow::on_actionLoad_Config_triggered()
+{
+    load();
+}
+

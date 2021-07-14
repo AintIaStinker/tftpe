@@ -21,7 +21,7 @@ tftp::tftp(QObject  *parent) : QObject(parent)
 void tftp::start()
 {
     file = new fileObj();
-    if(!file->openFile(filePath)){
+    if(!file->openFile(filePath, QIODevice::ReadOnly)){
         emit sendStatus("Error: Unable to open file");
         return;
     }
@@ -56,13 +56,11 @@ void tftp::setIpAddress(const QString &value)
         for(const auto &v : info.addresses()){
             if(v.protocol() == QAbstractSocket::NetworkLayerProtocol::IPv4Protocol){
                 ipAddress = v;
-                qDebug() << "Using IP Address : " << ipAddress;
                 return;
             }
         }
     }
     ipAddress = (QHostAddress)value;
-    qDebug() << "Using this other address : " << ipAddress;
 }
 
 quint16 tftp::getIpPort() const
@@ -115,6 +113,16 @@ void tftp::setSizeOfData(qint32 value)
     sizeOfData = value;
 }
 
+int tftp::getTSize() const
+{
+    return tSize;
+}
+
+void tftp::setTSize(int newTSize)
+{
+    tSize = newTSize;
+}
+
 void tftp::stop()
 {
     socketTimer.stop();
@@ -157,7 +165,17 @@ QByteArray tftp::dataPacket(ushort blockNumber, QByteArray data)
     return dataPkt;
 }
 
-void tftp::errorPacket(QString errorMessage)
+QByteArray tftp::pktACK(ushort blockNumber)
+{
+   QByteArray ack;
+   ack.append('\0');
+   ack.append(ACK);
+   ack.append(blockNumber >> 8);
+   ack.append(blockNumber & 0xFF);
+   return ack;
+}
+
+QByteArray tftp::errorPacket(QString errorMessage)
 {
     QByteArray error;
     error.append('\0');
@@ -166,7 +184,7 @@ void tftp::errorPacket(QString errorMessage)
     error.append('\0');
     error.append(errorMessage.toLocal8Bit());
     error.append('\0');
-    socket->writeDatagram(error, error.length(), getIpAddress(), getIpPort());
+    return error;
 }
 
 
@@ -185,6 +203,7 @@ void tftp::pktReadOACK(QByteArray *pkt)
     pkt->remove(0,2);
     QList<QByteArray> splitPkt = pkt->split('\0');
     setBlockSize(splitPkt[1].toInt());
+    setTSize(splitPkt[3].toInt());
 }
 
 void tftp::pktReadError(QByteArray *pkt)
@@ -195,6 +214,7 @@ void tftp::pktReadError(QByteArray *pkt)
     emit sendStatus("Ending transfer for " + getFileToSend());
 }
 
+
 void tftp::timeExpired()
 {
     socketTimer.stop();
@@ -203,6 +223,10 @@ void tftp::timeExpired()
     delete this;
 }
 
+void tftp::progressBarUpdate()
+{
+    emit setValue((getSizeOfData() / file->fileSize() * 100));
+}
 
 void tftp::readyRead()
 {
@@ -237,6 +261,7 @@ void tftp::readyRead()
         case ERROR:
             error = true;
             pktReadError(&packet);
+            socket->writeDatagram(errorPacket("Transfer ended."), getIpAddress(), getIpPort());
             stop();
             break;
 
@@ -251,7 +276,52 @@ void tftp::readyRead()
     }
 }
 
-void tftp::progressBarUpdate()
+void tftp::readyReadReceive()
 {
-    emit setValue((getSizeOfData() / file->fileSize() * 100));
+    if(socket->hasPendingDatagrams())
+    {
+        socketTimer.start(3000);
+        packet.resize(socket->pendingDatagramSize());
+
+        if(packet.size() == 0) return;
+
+        socket->readDatagram(packet.data(), packet.length(), &ipAddress, &ipPort);
+        pktBlockNumber = (((uchar)packet[2] << 8) | (uchar)packet[3]);
+
+        switch (packet.at(1))
+        {
+        case ACK:
+            if(lastPacket && blockNumber == pktBlockNumber)
+            {
+                stop();
+                return;
+            }
+            if(blockNumber == pktBlockNumber)
+            {
+                // Append data to file on disk
+            }
+            if(pktBlockNumber == prevBlockNumber)
+            {
+                // Send previous blockNumber
+                socket->writeDatagram(dataPacket(blockNumber, prevData), prevData.length() + 4, ipAddress, ipPort);
+            }
+            break;
+
+        case ERROR:
+            error = true;
+            pktReadError(&packet);
+            socket->writeDatagram(errorPacket("Transfer ended."), getIpAddress(), getIpPort());
+            stop();
+            break;
+
+        case OACK:
+            pktReadOACK(&packet);
+            // Send block number 0
+            break;
+
+        default:
+            break;
+        }
+    }
 }
+

@@ -5,6 +5,7 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include "tftp.h"
+#include "credits.h"
 #include <QProgressBar>
 
 QT_BEGIN_NAMESPACE
@@ -30,6 +31,14 @@ private slots:
 
     void on_btnDeleteRow_clicked();
 
+    void on_btnCredits_clicked();
+
+    void on_actionExit_triggered();
+
+    void on_actionSave_Config_triggered();
+
+    void on_actionLoad_Config_triggered();
+
 signals:
     void quitThread();
     void start();
@@ -45,8 +54,10 @@ private:
     bool transferInProgress = false;
     bool queueFileList();
     void startProcess();
-    QProgressBar *progressBar;
 
+    void save();
+    void load();
+    QProgressBar *progressBar;
 
 
 };
