@@ -31,8 +31,6 @@ private slots:
 
     void on_btnDeleteRow_clicked();
 
-    void on_btnCredits_clicked();
-
     void on_actionExit_triggered();
 
     void on_actionSave_Config_triggered();
@@ -40,6 +38,8 @@ private slots:
     void on_actionLoad_Config_triggered();
 
     void on_btnDeleteAll_clicked();
+
+    void on_actionCredits_triggered();
 
 signals:
     void quitThread();

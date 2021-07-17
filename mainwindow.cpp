@@ -104,7 +104,7 @@ void MainWindow::on_btnUpload_clicked()
         queueFileList();    //Generate list of files to process
         startProcess();     //Begin new thread & transfer file(s)
     }
-    ui->btnUpload->setDisabled(true);
+    //ui->btnUpload->setDisabled(true);
 }
 
 void MainWindow::startProcess()
@@ -145,14 +145,18 @@ void MainWindow::save()
                                                  "Save File",
                                                  QDir::currentPath(),
                                                  "*.tftp");
-    QFile file(fname);
-    file.open(QIODevice::WriteOnly);
-    QDataStream ds(&file);
-    ds << ui->leHost->text();
-    ds << ui->lePort->text();
-    ds << ui->cmbBlockSize->currentText();
-    queueFileList();
-    ds << fileList;
+
+    if(fname.length() > 0)
+    {
+        QFile file(fname);
+        file.open(QIODevice::WriteOnly);
+        QDataStream ds(&file);
+        ds << ui->leHost->text();
+        ds << ui->lePort->text();
+        ds << ui->cmbBlockSize->currentText();
+        queueFileList();
+        ds << fileList;
+    }
 
 }
 
@@ -162,33 +166,37 @@ void MainWindow::load()
                                                  "Select file to open",
                                                  QDir::currentPath(),
                                                  "*.tftp");
-    QFile file(fname);
-    file.open(QIODevice::ReadOnly);
-    QDataStream ds(&file);
-    QString host;
-    QString port;
-    QString combo;
-    QVector<QVector<QString>> files;
-
-    ds >> host >> port >> combo >> files;
-    ui->leHost->setText(host);
-    ui->lePort->setText(port);
-    ui->cmbBlockSize->setCurrentText(combo);
-
-    if(files.length() > 0)
+    if(fname.length() > 0)
     {
-        ui->tblFiles->setRowCount(files.length());
+        QFile file(fname);
+        file.open(QIODevice::ReadOnly);
+        QDataStream ds(&file);
+        QString host;
+        QString port;
+        QString combo;
+        QVector<QVector<QString>> files;
 
-        for(int i=0; i < files.length(); i++){
-            QFileInfo fi(files[i][0]);
-            QTableWidgetItem *filePath = new QTableWidgetItem(fi.filePath());
-            QTableWidgetItem *fileName = new QTableWidgetItem(fi.fileName());
-            ui->tblFiles->setItem(i, 0, filePath);
-            ui->tblFiles->setItem(i, 1, fileName);
-            filePath->setFlags(filePath->flags() & ~Qt::ItemIsEditable);
+        ds >> host >> port >> combo >> files;
+        ui->leHost->setText(host);
+        ui->lePort->setText(port);
+        ui->cmbBlockSize->setCurrentText(combo);
+
+        if(files.length() > 0)
+        {
+            ui->tblFiles->setRowCount(files.length());
+
+            for(int i=0; i < files.length(); i++){
+                QFileInfo fi(files[i][0]);
+                QTableWidgetItem *filePath = new QTableWidgetItem(fi.filePath());
+                QTableWidgetItem *fileName = new QTableWidgetItem(fi.fileName());
+                ui->tblFiles->setItem(i, 0, filePath);
+                ui->tblFiles->setItem(i, 1, fileName);
+                filePath->setFlags(filePath->flags() & ~Qt::ItemIsEditable);
+            }
+             ui->btnUpload->setEnabled(true);
         }
-         ui->btnUpload->setEnabled(true);
     }
+
 }
 
 void MainWindow::completed()
@@ -204,7 +212,7 @@ void MainWindow::completed()
     if (fileList.length() >= 2)
     {
         fileList.removeFirst();
-        emit tftp->sendStatus("Completed file " + tftp->getFileToSend() + "...");
+        emit tftp->sendStatus("Completed file <" + tftp->getFileToSend() + ">...");
         delete tftp;
         emit quitThread();
         startProcess();
@@ -212,7 +220,7 @@ void MainWindow::completed()
     }
     else
     {
-        emit tftp->sendStatus("Completed file " + tftp->getFileToSend() + "...");
+        emit tftp->sendStatus("Completed file <" + tftp->getFileToSend() + ">...");
         delete tftp;
         emit quitThread();
     }
@@ -224,18 +232,6 @@ void MainWindow::on_btnDeleteRow_clicked()
 {
     ui->tblFiles->removeRow(ui->tblFiles->currentRow());
     if(ui->tblFiles->rowCount() == 0) ui->btnUpload->setDisabled(true);
-}
-
-void MainWindow::on_btnCredits_clicked()
-{
-    credits *c = new credits(0);
-    c->exec();
-}
-
-
-void MainWindow::on_actionExit_triggered()
-{
-    QCoreApplication::quit();
 }
 
 
@@ -255,5 +251,18 @@ void MainWindow::on_btnDeleteAll_clicked()
 {
     ui->tblFiles->setRowCount(0);
     ui->btnUpload->setDisabled(true);
+}
+
+
+void MainWindow::on_actionCredits_triggered()
+{
+    credits *c = new credits(0);
+    c->exec();
+}
+
+
+void MainWindow::on_actionExit_triggered()
+{
+    QApplication::quit();
 }
 

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>797</width>
-    <height>612</height>
+    <width>830</width>
+    <height>503</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="palette">
    <palette>
@@ -97,10 +103,16 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>90</y>
-      <width>651</width>
+      <y>80</y>
+      <width>671</width>
       <height>371</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
+     </font>
     </property>
     <property name="tabShape">
      <enum>QTabWidget::Rounded</enum>
@@ -118,8 +130,20 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>8</pointsize>
+         </font>
+        </property>
         <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
+         <enum>QFrame::WinPanel</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Plain</enum>
@@ -195,16 +219,16 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>470</y>
-      <width>581</width>
+      <x>460</x>
+      <y>10</y>
+      <width>341</width>
       <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
      </font>
     </property>
     <property name="title">
@@ -215,14 +239,14 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>571</width>
+       <width>321</width>
        <height>20</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <family>Calibri</family>
-       <pointsize>12</pointsize>
+       <family>Segoe UI</family>
+       <pointsize>8</pointsize>
       </font>
      </property>
      <property name="text">
@@ -233,11 +257,17 @@
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>530</y>
-      <width>579</width>
+      <x>460</x>
+      <y>70</y>
+      <width>371</width>
       <height>24</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
+     </font>
     </property>
     <property name="layoutDirection">
      <enum>Qt::LeftToRight</enum>
@@ -265,15 +295,15 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>410</y>
+      <y>250</y>
       <width>111</width>
       <height>31</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>9</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
      </font>
     </property>
     <property name="text">
@@ -281,7 +311,7 @@
     </property>
     <property name="icon">
      <iconset resource="icons.qrc">
-      <normaloff>:/resources/icons/table-row-delete-icon.png</normaloff>:/resources/icons/table-row-delete-icon.png</iconset>
+      <normaloff>:/resources/icons/close.png</normaloff>:/resources/icons/close.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -301,8 +331,8 @@
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
      </font>
     </property>
     <property name="title">
@@ -331,8 +361,8 @@
      </property>
      <property name="font">
       <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
+       <family>Segoe UI</family>
+       <pointsize>8</pointsize>
       </font>
      </property>
      <property name="text">
@@ -351,8 +381,8 @@
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
      </font>
     </property>
     <property name="title">
@@ -375,8 +405,8 @@
      </property>
      <property name="font">
       <font>
-       <family>Calibri</family>
-       <pointsize>10</pointsize>
+       <family>Segoe UI</family>
+       <pointsize>8</pointsize>
       </font>
      </property>
      <property name="inputMethodHints">
@@ -394,15 +424,15 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>80</y>
       <width>111</width>
       <height>106</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>9</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
      </font>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -410,8 +440,8 @@
       <widget class="QPushButton" name="btnSelectFiles">
        <property name="font">
         <font>
-         <family>Calibri</family>
-         <pointsize>9</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="text">
@@ -419,7 +449,7 @@
        </property>
        <property name="icon">
         <iconset resource="icons.qrc">
-         <normaloff>:/resources/icons/file.png</normaloff>:/resources/icons/file.png</iconset>
+         <normaloff>:/resources/icons/add.png</normaloff>:/resources/icons/add.png</iconset>
        </property>
       </widget>
      </item>
@@ -427,8 +457,8 @@
       <widget class="QPushButton" name="btnUpload">
        <property name="font">
         <font>
-         <family>Calibri</family>
-         <pointsize>9</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="text">
@@ -444,8 +474,8 @@
       <widget class="QPushButton" name="btnCancel">
        <property name="font">
         <font>
-         <family>Calibri</family>
-         <pointsize>9</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="text">
@@ -453,7 +483,7 @@
        </property>
        <property name="icon">
         <iconset resource="icons.qrc">
-         <normaloff>:/resources/icons/forbidden.png</normaloff>:/resources/icons/forbidden.png</iconset>
+         <normaloff>:/resources/icons/cancel.png</normaloff>:/resources/icons/cancel.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -478,23 +508,10 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnCredits">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>530</y>
-      <width>111</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Credits</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>360</x>
       <y>10</y>
       <width>91</width>
       <height>51</height>
@@ -502,8 +519,8 @@
     </property>
     <property name="font">
      <font>
-      <family>Calibri</family>
-      <pointsize>10</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
      </font>
     </property>
     <property name="title">
@@ -520,8 +537,8 @@
      </property>
      <property name="font">
       <font>
-       <family>Calibri</family>
-       <pointsize>9</pointsize>
+       <family>Segoe UI</family>
+       <pointsize>8</pointsize>
       </font>
      </property>
      <property name="placeholderText">
@@ -568,13 +585,23 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>370</y>
+      <y>210</y>
       <width>111</width>
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
     <property name="text">
      <string>Delete All</string>
+    </property>
+    <property name="icon">
+     <iconset resource="icons.qrc">
+      <normaloff>:/resources/icons/garbage.png</normaloff>:/resources/icons/garbage.png</iconset>
     </property>
    </widget>
   </widget>
@@ -584,7 +611,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>797</width>
+     <width>830</width>
      <height>24</height>
     </rect>
    </property>
@@ -597,21 +624,51 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionCredits"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuAbout"/>
   </widget>
   <action name="actionSave_Config">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/resources/icons/diskette.png</normaloff>:/resources/icons/diskette.png</iconset>
+   </property>
    <property name="text">
     <string>Save Config</string>
    </property>
   </action>
   <action name="actionLoad_Config">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/resources/icons/folder.png</normaloff>:/resources/icons/folder.png</iconset>
+   </property>
    <property name="text">
     <string>Load Config</string>
    </property>
   </action>
   <action name="actionExit">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/resources/icons/power-button.png</normaloff>:/resources/icons/power-button.png</iconset>
+   </property>
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionCredits">
+   <property name="text">
+    <string>Credits</string>
    </property>
   </action>
  </widget>

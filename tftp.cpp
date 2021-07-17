@@ -22,13 +22,13 @@ void tftp::start()
 {
     file = new fileObj();
     if(!file->openFile(filePath, QIODevice::ReadOnly)){
-        emit sendStatus("Error: Unable to open file");
+        emit sendStatus("Error: Unable to open file <" + file->fileName(filePath) + ">");
         return;
     }
 
     socket->writeDatagram(sendRequest(getFileToSend(), getBlockSize(), file->fileSize()), getIpAddress(), getIpPort());
     emit setMaximum(100);
-    emit sendStatus("Sending file " + getFileToSend() + "...");
+    emit sendStatus("Sending file <" + getFileToSend() + ">...");
     socketTimer.start(3000);
     progressBarTimer.start(500);
 }
