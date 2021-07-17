@@ -1,9 +1,11 @@
 <RCC>
     <qresource prefix="/menu"/>
     <qresource prefix="/">
-        <file>resources/icons/file.png</file>
-        <file>resources/icons/forbidden.png</file>
-        <file>resources/icons/table-row-delete-icon.png</file>
+        <file>resources/icons/add.png</file>
+        <file>resources/icons/cancel.png</file>
+        <file>resources/icons/close.png</file>
+        <file>resources/icons/cloud-computing.png</file>
+        <file>resources/icons/garbage.png</file>
         <file>resources/icons/upload.png</file>
     </qresource>
 </RCC>

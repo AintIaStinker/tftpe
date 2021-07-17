@@ -92,16 +92,14 @@ signals:
     void setEnabled(bool value);        // Enables the upload button after a timeout
 
 public slots:
-    void timeExpired();
     void start();
     void stop();
 
-    void progressBarUpdate();
-    QByteArray errorPacket(QString errorMessage);
-
 private slots:
     void readyRead();
-    void readyReadReceive();
+    void timeExpired();
+    void progressBarUpdate();
+    QByteArray errorPacket(QString errorMessage);
 };
 
 #endif // TFTP_H

@@ -39,6 +39,8 @@ private slots:
 
     void on_actionLoad_Config_triggered();
 
+    void on_btnDeleteAll_clicked();
+
 signals:
     void quitThread();
     void start();

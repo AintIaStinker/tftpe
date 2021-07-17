@@ -11,7 +11,6 @@
 
 #include "tftp.h"
 #include "tftpmanager.h"
-#include "config.h"
 
 #include <QThread>
 #include <QQueue>
@@ -142,30 +141,54 @@ void MainWindow::startProcess()
 
 void MainWindow::save()
 {
-    QFile file("something.txt");
+    QString fname = QFileDialog::getSaveFileName(this,
+                                                 "Save File",
+                                                 QDir::currentPath(),
+                                                 "*.tftp");
+    QFile file(fname);
     file.open(QIODevice::WriteOnly);
     QDataStream ds(&file);
     ds << ui->leHost->text();
     ds << ui->lePort->text();
-    ds << ui->cmbBlockSize->currentData();
-
+    ds << ui->cmbBlockSize->currentText();
+    queueFileList();
+    ds << fileList;
 
 }
 
 void MainWindow::load()
 {
-    QFile file("something.txt");
+    QString fname = QFileDialog::getOpenFileName(this,
+                                                 "Select file to open",
+                                                 QDir::currentPath(),
+                                                 "*.tftp");
+    QFile file(fname);
     file.open(QIODevice::ReadOnly);
     QDataStream ds(&file);
     QString host;
     QString port;
+    QString combo;
+    QVector<QVector<QString>> files;
 
-
-
-    ds >> host >> port;
+    ds >> host >> port >> combo >> files;
     ui->leHost->setText(host);
     ui->lePort->setText(port);
-    qDebug() << "HOst " << host;
+    ui->cmbBlockSize->setCurrentText(combo);
+
+    if(files.length() > 0)
+    {
+        ui->tblFiles->setRowCount(files.length());
+
+        for(int i=0; i < files.length(); i++){
+            QFileInfo fi(files[i][0]);
+            QTableWidgetItem *filePath = new QTableWidgetItem(fi.filePath());
+            QTableWidgetItem *fileName = new QTableWidgetItem(fi.fileName());
+            ui->tblFiles->setItem(i, 0, filePath);
+            ui->tblFiles->setItem(i, 1, fileName);
+            filePath->setFlags(filePath->flags() & ~Qt::ItemIsEditable);
+        }
+         ui->btnUpload->setEnabled(true);
+    }
 }
 
 void MainWindow::completed()
@@ -200,6 +223,7 @@ void MainWindow::completed()
 void MainWindow::on_btnDeleteRow_clicked()
 {
     ui->tblFiles->removeRow(ui->tblFiles->currentRow());
+    if(ui->tblFiles->rowCount() == 0) ui->btnUpload->setDisabled(true);
 }
 
 void MainWindow::on_btnCredits_clicked()
@@ -224,5 +248,12 @@ void MainWindow::on_actionSave_Config_triggered()
 void MainWindow::on_actionLoad_Config_triggered()
 {
     load();
+}
+
+
+void MainWindow::on_btnDeleteAll_clicked()
+{
+    ui->tblFiles->setRowCount(0);
+    ui->btnUpload->setDisabled(true);
 }
 

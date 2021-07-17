@@ -140,16 +140,19 @@ void tftp::stop()
 QByteArray tftp::sendRequest(QString fileName, int blockSize, int fileSize)
 {
     QByteArray request;
-    unsigned char zeroByte = '\0';
-    request.append(zeroByte).append(WRQ).append(fileName.toStdString()).append(zeroByte).append("octet");
-    request.append(zeroByte);
+    request.append('\0').append(WRQ);
+    request.append(fileName.toStdString());
+    request.append('\0');
+    request.append("octet");
+    request.append('\0');
     request.append("blksize");
-    request.append(zeroByte);
+    request.append('\0');
     request.append(QByteArray::number(blockSize));
-    request.append(zeroByte);
+    request.append('\0');
     request.append("tsize");
-    request.append(zeroByte);
-    request.append(QByteArray::number(fileSize)).append(zeroByte);
+    request.append('\0');
+    request.append(QByteArray::number(fileSize));
+    request.append('\0');
     return request;
 }
 
@@ -275,53 +278,3 @@ void tftp::readyRead()
         }
     }
 }
-
-void tftp::readyReadReceive()
-{
-    if(socket->hasPendingDatagrams())
-    {
-        socketTimer.start(3000);
-        packet.resize(socket->pendingDatagramSize());
-
-        if(packet.size() == 0) return;
-
-        socket->readDatagram(packet.data(), packet.length(), &ipAddress, &ipPort);
-        pktBlockNumber = (((uchar)packet[2] << 8) | (uchar)packet[3]);
-
-        switch (packet.at(1))
-        {
-        case ACK:
-            if(lastPacket && blockNumber == pktBlockNumber)
-            {
-                stop();
-                return;
-            }
-            if(blockNumber == pktBlockNumber)
-            {
-                // Append data to file on disk
-            }
-            if(pktBlockNumber == prevBlockNumber)
-            {
-                // Send previous blockNumber
-                socket->writeDatagram(dataPacket(blockNumber, prevData), prevData.length() + 4, ipAddress, ipPort);
-            }
-            break;
-
-        case ERROR:
-            error = true;
-            pktReadError(&packet);
-            socket->writeDatagram(errorPacket("Transfer ended."), getIpAddress(), getIpPort());
-            stop();
-            break;
-
-        case OACK:
-            pktReadOACK(&packet);
-            // Send block number 0
-            break;
-
-        default:
-            break;
-        }
-    }
-}
-

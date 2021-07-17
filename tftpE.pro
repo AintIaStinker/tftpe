@@ -12,7 +12,6 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    config.cpp \
     credits.cpp \
     fileobj.cpp \
     main.cpp \
@@ -20,7 +19,6 @@ SOURCES += \
     tftp.cpp
 
 HEADERS += \
-    config.h \
     credits.h \
     fileobj.h \
     mainwindow.h \

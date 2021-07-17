@@ -81,10 +81,16 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>TftpE</string>
   </property>
   <property name="inputMethodHints">
    <set>Qt::ImhNone</set>
+  </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -259,7 +265,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>230</y>
+      <y>410</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -372,6 +378,9 @@
        <family>Calibri</family>
        <pointsize>10</pointsize>
       </font>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly</set>
      </property>
      <property name="text">
       <string>69</string>
@@ -554,6 +563,19 @@
       </property>
      </item>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="btnDeleteAll">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>370</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Delete All</string>
+    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
