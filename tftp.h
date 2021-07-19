@@ -73,11 +73,12 @@ private:
     QTimer socketTimer {this};
     QTimer progressBarTimer {this};
 
-    QByteArray sendRequest(QString fileName, int blockSize, int fileSize);
+    QByteArray sendRequest(OpCode requestType, QString fileName, int blockSize, int fileSize);
     QByteArray dataPacket(ushort blockNumber, QByteArray data);
     void writeDataPacket();
-    void pktReadOACK(QByteArray *pkt);
-    void pktReadError(QByteArray *pkt);
+    void saveDataPacket(QByteArray &pkt);
+    void pktReadOACK(QByteArray &pkt);
+    void pktReadError(QByteArray &pkt);
 
 
     QByteArray pktACK(ushort blockNumber);
@@ -92,11 +93,13 @@ signals:
     void setEnabled(bool value);        // Enables the upload button after a timeout
 
 public slots:
-    void start();
+    void startPut();
+    void startGet();
     void stop();
 
 private slots:
-    void readyRead();
+    void readyReadPut();
+    void readyReadGet();
     void timeExpired();
     void progressBarUpdate();
     QByteArray errorPacket(QString errorMessage);

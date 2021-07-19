@@ -41,6 +41,10 @@ private slots:
 
     void on_actionCredits_triggered();
 
+    void on_btnDownload_clicked();
+
+    void on_btnSelectFolder_clicked();
+
 signals:
     void quitThread();
     void start();
@@ -54,7 +58,9 @@ private:
     tftp *tftp;
 
     bool transferInProgress = false;
+    bool btnDownload = false;
     bool queueFileList();
+    void buildCellWidgets(QStringList &list);
     void startProcess();
 
     void save();

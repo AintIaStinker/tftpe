@@ -41,20 +41,10 @@ void MainWindow::on_btnSelectFiles_clicked()
 
     if(files.length() > 0)
     {
-        ui->tblFiles->setRowCount(files.length());
-
-        int count = 0;
-        for(const QString &i : files){
-            QTableWidgetItem *filePath = new QTableWidgetItem(i);
-            QFileInfo fi(i);
-            QTableWidgetItem *fileName = new QTableWidgetItem(fi.fileName());
-            ui->tblFiles->setItem(count, 0, filePath);
-            ui->tblFiles->setItem(count, 1, fileName);
-            count++;
-            filePath->setFlags(filePath->flags() & ~Qt::ItemIsEditable);
-        }
-         ui->btnUpload->setEnabled(true);
+        buildCellWidgets(files);
+        ui->btnUpload->setEnabled(true);
     }
+
 }
 
 
@@ -95,6 +85,26 @@ bool MainWindow::queueFileList()
         return false;
 }
 
+void MainWindow::buildCellWidgets(QStringList &list)
+{
+
+    if(list.length() > 0)
+    {
+        ui->tblFiles->setRowCount(list.length());
+
+        int count = 0;
+        for(const QString &i : list){
+            QTableWidgetItem *filePath = new QTableWidgetItem(i);
+            QFileInfo fi(i);
+            QTableWidgetItem *fileName = new QTableWidgetItem(fi.fileName());
+            ui->tblFiles->setItem(count, 0, filePath);
+            ui->tblFiles->setItem(count, 1, fileName);
+            count++;
+            filePath->setFlags(filePath->flags() & ~Qt::ItemIsEditable);
+        }
+    }
+}
+
 void MainWindow::on_btnUpload_clicked()
 {
     if(!queueFileList()) return;
@@ -105,6 +115,17 @@ void MainWindow::on_btnUpload_clicked()
         startProcess();     //Begin new thread & transfer file(s)
     }
     //ui->btnUpload->setDisabled(true);
+}
+
+void MainWindow::on_btnDownload_clicked()
+{
+    if(!queueFileList()) return;
+    else
+    {
+        btnDownload = true; // Setting flag
+        queueFileList();    //Generate list of files to process
+        startProcess();     //Begin new thread & transfer file(s)
+    }
 }
 
 void MainWindow::startProcess()
@@ -121,8 +142,11 @@ void MainWindow::startProcess()
     ui->progressBar->setMinimum(0);
     ui->progressBar->reset();
 
+    if(btnDownload)
+        connect(thread, &QThread::started, tftp, &tftp::startGet, Qt::QueuedConnection);
+    else
+        connect(thread, &QThread::started, tftp, &tftp::startPut, Qt::QueuedConnection);
 
-    connect(thread, &QThread::started, tftp, &tftp::start, Qt::QueuedConnection);
     connect(this, &MainWindow::quitThread, thread, &QThread::quit, Qt::QueuedConnection);
     connect(tftp, &tftp::completed, this, &MainWindow::completed, Qt::QueuedConnection);
     connect(this, &MainWindow::stop, tftp, &tftp::stop, Qt::QueuedConnection);
@@ -137,6 +161,7 @@ void MainWindow::startProcess()
 
     thread->start();
     transferInProgress = true;
+    btnDownload = false;    // reset
 }
 
 void MainWindow::save()
@@ -193,7 +218,7 @@ void MainWindow::load()
                 ui->tblFiles->setItem(i, 1, fileName);
                 filePath->setFlags(filePath->flags() & ~Qt::ItemIsEditable);
             }
-             ui->btnUpload->setEnabled(true);
+            ui->btnUpload->setEnabled(true);
         }
     }
 
@@ -264,5 +289,18 @@ void MainWindow::on_actionCredits_triggered()
 void MainWindow::on_actionExit_triggered()
 {
     QApplication::quit();
+}
+
+
+void MainWindow::on_btnSelectFolder_clicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this,
+                                                     "Select folder",
+                                                     QDir::homePath());
+
+
+    QStringList info = QDir(path).entryList();
+
+    buildCellWidgets(info);
 }
 

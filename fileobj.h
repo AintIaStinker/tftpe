@@ -17,7 +17,7 @@ public:
     bool openFile(QString fileName, QIODevice::OpenModeFlag openMode);
     void closeFile();
 
-    void appendBytes(const QByteArray &bytes);
+    void writeBytes(const QByteArray &bytes);
 private:
     QFile file;
 

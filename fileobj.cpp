@@ -38,7 +38,7 @@ QByteArray fileObj::readBytes(int blockSize)
     return readTheBytes;
 }
 
-void fileObj::appendBytes(const QByteArray &bytes)
+void fileObj::writeBytes(const QByteArray &bytes)
 {
    file.write(bytes);
 }

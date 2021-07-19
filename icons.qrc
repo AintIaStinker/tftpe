@@ -13,5 +13,7 @@
         <file>resources/icons/emergency-exit.png</file>
         <file>resources/icons/bin.png</file>
         <file>resources/icons/power-button.png</file>
+        <file>resources/icons/add-folder.png</file>
+        <file>resources/icons/add-file.png</file>
     </qresource>
 </RCC>

@@ -15,10 +15,16 @@ tftp::tftp(QObject  *parent) : QObject(parent)
 
     connect(&socketTimer, &QTimer::timeout, this, &tftp::timeExpired);
     connect(&progressBarTimer, &QTimer::timeout, this, &tftp::progressBarUpdate);
-    connect(socket, &QIODevice::readyRead, this, &tftp::readyRead);
+
 }
 
-void tftp::start()
+tftp::~tftp()
+{
+    delete socket;
+    delete file;
+}
+
+void tftp::startPut()
 {
     file = new fileObj();
     if(!file->openFile(filePath, QIODevice::ReadOnly)){
@@ -26,18 +32,30 @@ void tftp::start()
         return;
     }
 
-    socket->writeDatagram(sendRequest(getFileToSend(), getBlockSize(), file->fileSize()), getIpAddress(), getIpPort());
+    connect(socket, &QIODevice::readyRead, this, &tftp::readyReadPut);
+
+    socket->writeDatagram(sendRequest(WRQ, getFileToSend(), getBlockSize(), file->fileSize()), getIpAddress(), getIpPort());
     emit setMaximum(100);
     emit sendStatus("Sending file <" + getFileToSend() + ">...");
     socketTimer.start(3000);
     progressBarTimer.start(500);
 }
 
-// Destructor
-tftp::~tftp()
+void tftp::startGet()
 {
-    delete socket;
-    delete file;
+    file = new fileObj();
+    if(!file->openFile(filePath, QIODevice::WriteOnly)){
+        emit sendStatus("Error: Unable to open file <" + file->fileName(filePath) + ">");
+        return;
+    }
+
+    connect(socket, &QIODevice::readyRead, this, &tftp::readyReadGet);
+
+    socket->writeDatagram(sendRequest(RRQ, getFileToSend(), getBlockSize(), file->fileSize()), getIpAddress(), getIpPort());
+    emit setMaximum(100);
+    emit sendStatus("Beginning transfer of file <" + getFileToSend() + ">...");
+    socketTimer.start(3000);
+    progressBarTimer.start(500);
 }
 
 
@@ -132,15 +150,15 @@ void tftp::stop()
     progressBarUpdate();
     if(!error)
     {
-      emit completed();
+        emit completed();
     }
 }
 
 // Build the request packet
-QByteArray tftp::sendRequest(QString fileName, int blockSize, int fileSize)
+QByteArray tftp::sendRequest(OpCode requestType, QString fileName, int blockSize, int fileSize)
 {
     QByteArray request;
-    request.append('\0').append(WRQ);
+    request.append('\0').append(requestType);
     request.append(fileName.toStdString());
     request.append('\0');
     request.append("octet");
@@ -170,12 +188,12 @@ QByteArray tftp::dataPacket(ushort blockNumber, QByteArray data)
 
 QByteArray tftp::pktACK(ushort blockNumber)
 {
-   QByteArray ack;
-   ack.append('\0');
-   ack.append(ACK);
-   ack.append(blockNumber >> 8);
-   ack.append(blockNumber & 0xFF);
-   return ack;
+    QByteArray ack;
+    ack.append('\0');
+    ack.append(ACK);
+    ack.append(blockNumber >> 8);
+    ack.append(blockNumber & 0xFF);
+    return ack;
 }
 
 QByteArray tftp::errorPacket(QString errorMessage)
@@ -201,18 +219,26 @@ void tftp::writeDataPacket()
     if(data.length() < blockSize) lastPacket = true;
 }
 
-void tftp::pktReadOACK(QByteArray *pkt)
+void tftp::saveDataPacket(QByteArray &pkt)
 {
-    pkt->remove(0,2);
-    QList<QByteArray> splitPkt = pkt->split('\0');
+    pkt.remove(0, 4);
+    file->writeBytes(pkt);
+    setSizeOfData(sizeOfData += pkt.length());
+    if(pkt.length() < blockSize) lastPacket = true;
+}
+
+void tftp::pktReadOACK(QByteArray &pkt)
+{
+    pkt.remove(0,2);
+    QList<QByteArray> splitPkt = pkt.split('\0');
     setBlockSize(splitPkt[1].toInt());
     setTSize(splitPkt[3].toInt());
 }
 
-void tftp::pktReadError(QByteArray *pkt)
+void tftp::pktReadError(QByteArray &pkt)
 {
-    pkt->remove(0,4);
-    QString error = pkt->data();
+    pkt.remove(0,4);
+    QString error = pkt.data();
     emit sendStatus("Recieved Error: " + error);
     emit sendStatus("Ending transfer for " + getFileToSend());
 }
@@ -228,10 +254,10 @@ void tftp::timeExpired()
 
 void tftp::progressBarUpdate()
 {
-    emit setValue((getSizeOfData() / file->fileSize() * 100));
+    emit setValue((getSizeOfData() / getTSize() * 100));
 }
 
-void tftp::readyRead()
+void tftp::readyReadPut()
 {
     if(socket->hasPendingDatagrams())
     {
@@ -241,11 +267,11 @@ void tftp::readyRead()
         if(packet.size() == 0) return;
 
         socket->readDatagram(packet.data(), packet.length(), &ipAddress, &ipPort);
-        pktBlockNumber = (((uchar)packet[2] << 8) | (uchar)packet[3]);
 
         switch (packet.at(1))
         {
         case ACK:
+            pktBlockNumber = (((uchar)packet[2] << 8) | (uchar)packet[3]);
             if(lastPacket && blockNumber == pktBlockNumber)
             {
                 stop();
@@ -263,14 +289,56 @@ void tftp::readyRead()
 
         case ERROR:
             error = true;
-            pktReadError(&packet);
+            pktReadError(packet);
             socket->writeDatagram(errorPacket("Transfer ended."), getIpAddress(), getIpPort());
             stop();
             break;
 
         case OACK:
-            pktReadOACK(&packet);
+            pktReadOACK(packet);
             writeDataPacket();
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+void tftp::readyReadGet()
+{
+    if(socket->hasPendingDatagrams())
+    {
+        socketTimer.start(5000);    // Changed timer to 5 seconds
+        packet.resize(socket->pendingDatagramSize());
+
+        if(packet.size() == 0) return;  // for null ICMP messages that trigger readyRead()
+
+        socket->readDatagram(packet.data(), packet.length(), &ipAddress, &ipPort);
+
+        switch (packet.at(1))
+        {
+        case DATA:
+            pktBlockNumber = (((uchar)packet[2] << 8) | (uchar)packet[3]);
+            saveDataPacket(packet);
+            socket->writeDatagram(pktACK(pktBlockNumber), getIpAddress(), getIpPort());
+            if(lastPacket)
+            {
+                stop();
+            }
+            break;
+
+        case ERROR:
+            error = true;
+            pktReadError(packet);
+            socket->writeDatagram(errorPacket("Error - Transmission ended."), getIpAddress(), getIpPort());
+            stop();
+            break;
+
+        case OACK:
+            pktReadOACK(packet);
+            // send ACK
+            socket->writeDatagram(pktACK(blockNumber), getIpAddress(), getIpPort());
             break;
 
         default:
